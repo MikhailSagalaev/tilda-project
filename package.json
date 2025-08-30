@@ -1,0 +1,23 @@
+{
+  "name": "tilda-project",
+  "version": "1.0.0",
+  "description": "Современный проект для Tilda с красивым дизайном и адаптивной версткой",
+  "main": "index.html",
+  "scripts": {
+    "dev": "live-server --port=3000 --open=/",
+    "build": "echo 'Build completed'",
+    "preview": "live-server --port=3000 --open=/dist"
+  },
+  "keywords": [
+    "tilda",
+    "landing-page",
+    "responsive",
+    "modern-design"
+  ],
+  "author": "Mikhail Sagalaev",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {}
+}
