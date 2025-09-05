@@ -1,0 +1,282 @@
+<!-- Прелоадер вариант 1: Slide to Unlock -->
+<!--
+  ВАРИАНТЫ ФОНА (задаём на #preloader-slide через data-атрибуты):
+  1) Градиент:
+     data-bg-type="gradient"
+     data-bg-value="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+     Если значение градиента НЕ задано — фон будет белым (#fff).
+
+  2) Видео:
+     data-bg-type="video"
+     data-bg-value="https://example.com/video.mp4"
+
+  3) Картинка:
+     data-bg-type="image"
+     data-bg-value="https://example.com/image.jpg"
+-->
+<div id="preloader-slide" data-bg-type="video" data-bg-value="https://b4701886-2e3c-4a60-9e9f-056bd416f1cc.selstorage.ru/IMG_5120.MP4">
+  <div class="bg-holder"><video class="bg-video" playsinline muted loop preload="auto"></video><img class="bg-img" alt="" /></div>
+  <div class="slide-container">
+    <div class="slide-track">
+      <div class="slide-text">Разблокируйте</div>
+      <div class="slide-button" id="slideButton">
+        <div class="slide-icon">
+          <svg class="arrow-icon" viewBox="0 0 24 24" width="20" height="20">
+            <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z" fill="currentColor"/>
+          </svg>
+          <svg class="check-icon" viewBox="0 0 24 24" width="20" height="20" style="display:none;">
+            <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.body.style.overflow = 'hidden';
+
+const slideButton = document.getElementById('slideButton');
+const slideContainer = slideButton.closest('.slide-container');
+const arrowIcon = slideButton.querySelector('.arrow-icon');
+const checkIcon = slideButton.querySelector('.check-icon');
+
+// Настройка фона через data-атрибуты контейнера
+const preloaderRoot = document.getElementById('preloader-slide');
+const bgHolder = preloaderRoot.querySelector('.bg-holder');
+const bgVideo = preloaderRoot.querySelector('.bg-video');
+const bgType = (preloaderRoot.getAttribute('data-bg-type') || 'gradient').toLowerCase();
+// Если градиент не указан — будет белый фон (см. setupBackground)
+const bgValue = preloaderRoot.getAttribute('data-bg-value') || '';
+const bgImg = preloaderRoot.querySelector('.bg-img');
+
+function setupBackground() {
+  if (bgType === 'video') {
+    bgHolder.style.background = 'none';
+    if (bgImg) { bgImg.removeAttribute('src'); bgImg.style.display = 'none'; }
+    bgVideo.style.display = 'block';
+    bgVideo.src = bgValue;
+    const tryPlay = function() { bgVideo.play().catch(function(){ /* autoplay may be blocked; ignore */ }); };
+    bgVideo.addEventListener('canplay', tryPlay, { once: true });
+    tryPlay();
+  } else if (bgType === 'image') {
+    bgVideo.removeAttribute('src');
+    bgVideo.style.display = 'none';
+    if (bgImg) { bgImg.src = bgValue; bgImg.style.display = 'block'; }
+    bgHolder.style.background = 'none';
+  } else {
+    // Градиент. Если не задано значение — используем белый фон
+    bgVideo.removeAttribute('src');
+    bgVideo.style.display = 'none';
+    if (bgImg) { bgImg.removeAttribute('src'); bgImg.style.display = 'none'; }
+    bgHolder.style.background = (bgValue && bgValue.trim()) ? bgValue : '#fff';
+  }
+}
+
+setupBackground();
+
+let isDragging = false;
+let startX = 0;
+let currentX = 0;
+let maxX = 0;
+
+function initSlider() {
+  const containerRect = slideContainer.getBoundingClientRect();
+  const buttonRect = slideButton.getBoundingClientRect();
+  maxX = containerRect.width - buttonRect.width - 8; // 8px padding
+}
+
+function handleStart(e) {
+  isDragging = true;
+  startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+  currentX = parseInt(slideButton.style.left || '0');
+  slideButton.style.transition = 'none';
+  initSlider();
+}
+
+function handleMove(e) {
+  if (!isDragging) return;
+  e.preventDefault();
+  
+  const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+  const deltaX = clientX - startX;
+  const newX = Math.max(0, Math.min(maxX, currentX + deltaX));
+  
+  slideButton.style.left = newX + 'px';
+  
+  // Проверяем завершение
+  if (newX >= maxX * 0.9) {
+    completeUnlock();
+  }
+}
+
+function handleEnd() {
+  if (!isDragging) return;
+  isDragging = false;
+  
+  const currentLeft = parseInt(slideButton.style.left || '0');
+  if (currentLeft < maxX * 0.9) {
+    // Возврат к началу
+    slideButton.style.transition = 'left 0.3s ease';
+    slideButton.style.left = '0px';
+  }
+}
+
+function completeUnlock() {
+  isDragging = false;
+  
+  // Анимация до конца
+  slideButton.style.transition = 'left 0.3s ease';
+  slideButton.style.left = maxX + 'px';
+  
+  // Смена иконки
+  setTimeout(() => {
+    arrowIcon.style.display = 'none';
+    checkIcon.style.display = 'block';
+    slideButton.style.background = '#4CAF50';
+  }, 300);
+  
+  // Загрузка страницы
+  setTimeout(() => {
+    document.body.style.overflow = '';
+    const preloader = document.getElementById('preloader-slide');
+    const fadeout = setInterval(() => {
+      const opacity = getComputedStyle(preloader).opacity;
+      opacity > 0 ? preloader.style.opacity = opacity - 0.05 : (clearInterval(fadeout), preloader.remove());
+    }, 15);
+  }, 1000);
+}
+
+// События
+slideButton.addEventListener('mousedown', handleStart);
+slideButton.addEventListener('touchstart', handleStart, {passive: false});
+document.addEventListener('mousemove', handleMove);
+document.addEventListener('touchmove', handleMove, {passive: false});
+document.addEventListener('mouseup', handleEnd);
+document.addEventListener('touchend', handleEnd);
+
+// Инициализация
+window.addEventListener('resize', initSlider);
+setTimeout(initSlider, 100);
+</script>
+
+<style>
+#preloader-slide {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  opacity: 1;
+  /* Базовый фон по умолчанию — белый. Реальный фон задаёт .bg-holder из data-атрибутов */
+  background: #ffffff;
+  overflow: hidden;
+  cursor: default;
+  padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+}
+
+.bg-holder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bg-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* не растягиваем, сохраняем исходные пропорции */
+  display: none;
+}
+
+/* Картинка-фон для режима image: не растягивается на десктопе */
+.bg-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  display: none;
+}
+
+.slide-container {
+  position: relative;
+  margin: 40px 0;
+  width: 320px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.slide-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+}
+
+.slide-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Цвет текста "Разблокируйте" меняем здесь */
+  color: white;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.slide-button {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 52px;
+  height: 52px;
+  background: white;
+  border-radius: 50%;
+  cursor: grab;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.slide-button:active {
+  cursor: grabbing;
+}
+
+.slide-icon {
+  color: #667eea;
+  transition: color 0.3s ease;
+}
+
+.slide-button[style*="background: rgb(76, 175, 80)"] .slide-icon {
+  color: white;
+}
+</style>

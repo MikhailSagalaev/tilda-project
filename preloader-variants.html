@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прелоадеры - Варианты</title>
+</head>
+<body>
+
+<!-- Вариант 1: Slide to Unlock -->
+<div id="preloader-slide" style="display:none;">
+  <div class="slide-container">
+    <div class="slide-track">
+      <div class="slide-text">Разблокируйте</div>
+      <div class="slide-button" id="slideButton">
+        <div class="slide-icon">
+          <svg class="arrow-icon" viewBox="0 0 24 24" width="20" height="20">
+            <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z" fill="currentColor"/>
+          </svg>
+          <svg class="check-icon" viewBox="0 0 24 24" width="20" height="20" style="display:none;">
+            <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Вариант 2: Загрузка приглашения с пазл-сердечком -->
+<div id="preloader-invitation">
+  <div class="heart-puzzle">
+    <div class="heart-piece piece-1"></div>
+    <div class="heart-piece piece-2"></div>
+    <div class="heart-piece piece-3"></div>
+    <div class="heart-piece piece-4"></div>
+    <div class="heart-piece piece-5"></div>
+    <div class="heart-piece piece-6"></div>
+  </div>
+  <div class="loading-text">
+    <div class="main-text">Загрузка приглашения 💌</div>
+    <div class="dots">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Основной контент -->
+<div id="main-content" style="padding: 40px; text-align: center;">
+  <h1>Страница загружена!</h1>
+  <p>Выберите тип прелоадера:</p>
+  <button onclick="showSlidePreloader()">Показать Slide to Unlock</button>
+  <button onclick="showInvitationPreloader()">Показать Загрузка приглашения</button>
+</div>
+
+<script>
+// Общие функции
+function hideAllPreloaders() {
+  document.getElementById('preloader-slide').style.display = 'none';
+  document.getElementById('preloader-invitation').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function fadeOutPreloader(preloaderId) {
+  const preloader = document.getElementById(preloaderId);
+  const fadeout = setInterval(() => {
+    const opacity = getComputedStyle(preloader).opacity;
+    if (opacity > 0) {
+      preloader.style.opacity = opacity - 0.05;
+    } else {
+      clearInterval(fadeout);
+      preloader.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }, 15);
+}
+
+// === Slide to Unlock Preloader ===
+function showSlidePreloader() {
+  hideAllPreloaders();
+  document.body.style.overflow = 'hidden';
+  
+  const preloader = document.getElementById('preloader-slide');
+  preloader.style.display = 'flex';
+  preloader.style.opacity = '1';
+  
+  const slideButton = document.getElementById('slideButton');
+  const slideContainer = slideButton.closest('.slide-container');
+  const arrowIcon = slideButton.querySelector('.arrow-icon');
+  const checkIcon = slideButton.querySelector('.check-icon');
+  
+  // Reset button state
+  slideButton.style.left = '0px';
+  slideButton.style.background = 'white';
+  arrowIcon.style.display = 'block';
+  checkIcon.style.display = 'none';
+
+  let isDragging = false;
+  let startX = 0;
+  let currentX = 0;
+  let maxX = 0;
+
+  function initSlider() {
+    const containerRect = slideContainer.getBoundingClientRect();
+    const buttonRect = slideButton.getBoundingClientRect();
+    maxX = containerRect.width - buttonRect.width - 8;
+  }
+
+  function handleStart(e) {
+    isDragging = true;
+    startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+    currentX = parseInt(slideButton.style.left || '0');
+    slideButton.style.transition = 'none';
+    initSlider();
+  }
+
+  function handleMove(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    
+    const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+    const deltaX = clientX - startX;
+    const newX = Math.max(0, Math.min(maxX, currentX + deltaX));
+    
+    slideButton.style.left = newX + 'px';
+    
+    if (newX >= maxX * 0.9) {
+      completeUnlock();
+    }
+  }
+
+  function handleEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    const currentLeft = parseInt(slideButton.style.left || '0');
+    if (currentLeft < maxX * 0.9) {
+      slideButton.style.transition = 'left 0.3s ease';
+      slideButton.style.left = '0px';
+    }
+  }
+
+  function completeUnlock() {
+    isDragging = false;
+    slideButton.style.transition = 'left 0.3s ease';
+    slideButton.style.left = maxX + 'px';
+    
+    setTimeout(() => {
+      arrowIcon.style.display = 'none';
+      checkIcon.style.display = 'block';
+      slideButton.style.background = '#4CAF50';
+    }, 300);
+    
+    setTimeout(() => fadeOutPreloader('preloader-slide'), 1000);
+  }
+
+  // Clean up old listeners
+  slideButton.removeEventListener('mousedown', handleStart);
+  slideButton.removeEventListener('touchstart', handleStart);
+  
+  // Add new listeners
+  slideButton.addEventListener('mousedown', handleStart);
+  slideButton.addEventListener('touchstart', handleStart, {passive: false});
+  document.addEventListener('mousemove', handleMove);
+  document.addEventListener('touchmove', handleMove, {passive: false});
+  document.addEventListener('mouseup', handleEnd);
+  document.addEventListener('touchend', handleEnd);
+
+  window.addEventListener('resize', initSlider);
+  setTimeout(initSlider, 100);
+}
+
+// === Invitation Preloader ===
+function showInvitationPreloader() {
+  hideAllPreloaders();
+  document.body.style.overflow = 'hidden';
+  
+  const preloader = document.getElementById('preloader-invitation');
+  preloader.style.display = 'flex';
+  preloader.style.opacity = '1';
+  
+  const pieces = document.querySelectorAll('.heart-piece');
+  
+  // Reset pieces
+  pieces.forEach(piece => piece.classList.remove('assembled'));
+  document.querySelector('.heart-puzzle').classList.remove('complete');
+  
+  let currentPiece = 0;
+
+  function animateHeartAssembly() {
+    if (currentPiece < pieces.length) {
+      pieces[currentPiece].classList.add('assembled');
+      currentPiece++;
+      setTimeout(animateHeartAssembly, 500);
+    } else {
+      setTimeout(() => {
+        document.querySelector('.heart-puzzle').classList.add('complete');
+        setTimeout(() => fadeOutPreloader('preloader-invitation'), 800);
+      }, 500);
+    }
+  }
+
+  setTimeout(animateHeartAssembly, 800);
+}
+
+// Auto-start invitation preloader on page load
+document.addEventListener('DOMContentLoaded', function() {
+  showInvitationPreloader();
+});
+</script>
+
+<style>
+/* === Общие стили === */
+#preloader-slide,
+#preloader-invitation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  opacity: 1;
+  overflow: hidden;
+}
+
+/* === Slide to Unlock === */
+#preloader-slide {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: default;
+}
+
+.slide-container {
+  position: relative;
+  width: 320px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.slide-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+}
+
+.slide-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.slide-button {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 52px;
+  height: 52px;
+  background: white;
+  border-radius: 50%;
+  cursor: grab;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.slide-button:active {
+  cursor: grabbing;
+}
+
+.slide-icon {
+  color: #667eea;
+  transition: color 0.3s ease;
+}
+
+.slide-button[style*="rgb(76, 175, 80)"] .slide-icon {
+  color: white;
+}
+
+/* === Invitation Preloader === */
+#preloader-invitation {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+  cursor: wait;
+  flex-direction: column;
+}
+
+/* Сердечко-пазл */
+.heart-puzzle {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 40px;
+  transform: scale(0.8);
+  transition: transform 0.5s ease;
+}
+
+.heart-puzzle.complete {
+  transform: scale(1.2);
+  animation: heartBeat 1s infinite;
+}
+
+.heart-piece {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  opacity: 0;
+  transform: scale(0.3) rotate(180deg);
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.heart-piece.assembled {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+/* Базовая форма сердечка для каждой части */
+.heart-piece:before {
+  content: "";
+  position: absolute;
+  width: 13px;
+  height: 20px;
+  background: #ff4757;
+  border-radius: 13px 13px 0 0;
+  transform: rotate(-45deg);
+  transform-origin: 0 100%;
+}
+
+.heart-piece:after {
+  content: "";
+  position: absolute;
+  width: 13px;
+  height: 20px;
+  background: #ff4757;
+  border-radius: 13px 13px 0 0;
+  transform: rotate(45deg);
+  transform-origin: 100% 100%;
+  left: 13px;
+}
+
+/* Позиционирование частей пазла */
+.piece-1 { top: 5px; left: 15px; }
+.piece-2 { top: 5px; right: 15px; }
+.piece-3 { top: 25px; left: 20px; }
+.piece-4 { top: 25px; right: 20px; }
+.piece-5 { bottom: 15px; left: 25px; }
+.piece-6 { bottom: 15px; right: 25px; }
+
+/* Задержки появления */
+.piece-1.assembled { transition-delay: 0s; }
+.piece-2.assembled { transition-delay: 0.1s; }
+.piece-3.assembled { transition-delay: 0.2s; }
+.piece-4.assembled { transition-delay: 0.1s; }
+.piece-5.assembled { transition-delay: 0.3s; }
+.piece-6.assembled { transition-delay: 0.2s; }
+
+/* Текст загрузки */
+.loading-text {
+  text-align: center;
+  color: white;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.main-text {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Анимированные точки */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: dotPulse 1.4s infinite ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1.2) }
+  14% { transform: scale(1.3) }
+  28% { transform: scale(1.2) }
+  42% { transform: scale(1.25) }
+  70% { transform: scale(1.2) }
+  100% { transform: scale(1.2) }
+}
+
+/* Респонсив */
+@media (max-width: 480px) {
+  .slide-container {
+    width: 280px;
+    height: 50px;
+  }
+  
+  .slide-button {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .main-text {
+    font-size: 20px;
+  }
+  
+  .heart-puzzle {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Демо-стили */
+button {
+  margin: 10px;
+  padding: 12px 24px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 500;
+}
+
+button:hover {
+  background: #764ba2;
+}
+</style>
+
+<script>
+// Инициализация
+hideAllPreloaders();
+
+// === Slide to Unlock Functions ===
+function showSlidePreloader() {
+  hideAllPreloaders();
+  document.body.style.overflow = 'hidden';
+  
+  const preloader = document.getElementById('preloader-slide');
+  preloader.style.display = 'flex';
+  preloader.style.opacity = '1';
+  
+  const slideButton = document.getElementById('slideButton');
+  const slideContainer = slideButton.closest('.slide-container');
+  const arrowIcon = slideButton.querySelector('.arrow-icon');
+  const checkIcon = slideButton.querySelector('.check-icon');
+  
+  // Reset
+  slideButton.style.left = '0px';
+  slideButton.style.background = 'white';
+  arrowIcon.style.display = 'block';
+  checkIcon.style.display = 'none';
+
+  let isDragging = false;
+  let startX = 0;
+  let currentX = 0;
+  let maxX = 0;
+
+  function initSlider() {
+    const containerRect = slideContainer.getBoundingClientRect();
+    const buttonRect = slideButton.getBoundingClientRect();
+    maxX = containerRect.width - buttonRect.width - 8;
+  }
+
+  function handleStart(e) {
+    isDragging = true;
+    startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+    currentX = parseInt(slideButton.style.left || '0');
+    slideButton.style.transition = 'none';
+    initSlider();
+  }
+
+  function handleMove(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    
+    const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+    const deltaX = clientX - startX;
+    const newX = Math.max(0, Math.min(maxX, currentX + deltaX));
+    
+    slideButton.style.left = newX + 'px';
+    
+    if (newX >= maxX * 0.9) {
+      completeUnlock();
+    }
+  }
+
+  function handleEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    const currentLeft = parseInt(slideButton.style.left || '0');
+    if (currentLeft < maxX * 0.9) {
+      slideButton.style.transition = 'left 0.3s ease';
+      slideButton.style.left = '0px';
+    }
+  }
+
+  function completeUnlock() {
+    isDragging = false;
+    slideButton.style.transition = 'left 0.3s ease';
+    slideButton.style.left = maxX + 'px';
+    
+    setTimeout(() => {
+      arrowIcon.style.display = 'none';
+      checkIcon.style.display = 'block';
+      slideButton.style.background = '#4CAF50';
+    }, 300);
+    
+    setTimeout(() => fadeOutPreloader('preloader-slide'), 1000);
+  }
+
+  slideButton.addEventListener('mousedown', handleStart);
+  slideButton.addEventListener('touchstart', handleStart, {passive: false});
+  document.addEventListener('mousemove', handleMove);
+  document.addEventListener('touchmove', handleMove, {passive: false});
+  document.addEventListener('mouseup', handleEnd);
+  document.addEventListener('touchend', handleEnd);
+
+  window.addEventListener('resize', initSlider);
+  setTimeout(initSlider, 100);
+}
+
+// === Invitation Preloader Functions ===
+function showInvitationPreloader() {
+  hideAllPreloaders();
+  document.body.style.overflow = 'hidden';
+  
+  const preloader = document.getElementById('preloader-invitation');
+  preloader.style.display = 'flex';
+  preloader.style.opacity = '1';
+  
+  const pieces = document.querySelectorAll('.heart-piece');
+  
+  // Reset
+  pieces.forEach(piece => piece.classList.remove('assembled'));
+  document.querySelector('.heart-puzzle').classList.remove('complete');
+  
+  let currentPiece = 0;
+
+  function animateHeartAssembly() {
+    if (currentPiece < pieces.length) {
+      pieces[currentPiece].classList.add('assembled');
+      currentPiece++;
+      setTimeout(animateHeartAssembly, 500);
+    } else {
+      setTimeout(() => {
+        document.querySelector('.heart-puzzle').classList.add('complete');
+        setTimeout(() => fadeOutPreloader('preloader-invitation'), 800);
+      }, 500);
+    }
+  }
+
+  setTimeout(animateHeartAssembly, 800);
+}
+</script>
+
+</body>
+</html>

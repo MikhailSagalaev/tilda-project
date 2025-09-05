@@ -1,0 +1,270 @@
+<!-- Прелоадер вариант 2: Загрузка приглашения с сердечком-пазлом -->
+<div id="preloader-invitation">
+  <div class="heart-puzzle">
+    <div class="heart-piece piece-1"></div>
+    <div class="heart-piece piece-2"></div>
+    <div class="heart-piece piece-3"></div>
+    <div class="heart-piece piece-4"></div>
+    <div class="heart-piece piece-5"></div>
+    <div class="heart-piece piece-6"></div>
+  </div>
+  <div class="loading-text">
+    <div class="main-text">Загрузка приглашения <span class="envelope">💌</span></div>
+    <div class="dots">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+document.body.style.overflow = 'hidden';
+
+const pieces = document.querySelectorAll('.heart-piece');
+let currentPiece = 0;
+
+// Анимация сборки сердечка по частям
+function animateHeartAssembly() {
+  if (currentPiece < pieces.length) {
+    pieces[currentPiece].classList.add('assembled');
+    currentPiece++;
+    setTimeout(animateHeartAssembly, 500); // каждые 500ms новая часть
+  } else {
+    // Все части собраны - завершаем загрузку
+    setTimeout(() => {
+      document.querySelector('.heart-puzzle').classList.add('complete');
+      setTimeout(completeLoading, 800);
+    }, 500);
+  }
+}
+
+function completeLoading() {
+  document.body.style.overflow = '';
+  const preloader = document.getElementById('preloader-invitation');
+  const fadeout = setInterval(() => {
+    const opacity = getComputedStyle(preloader).opacity;
+    opacity > 0 ? preloader.style.opacity = opacity - 0.05 : (clearInterval(fadeout), preloader.remove());
+  }, 15);
+}
+
+// Запуск анимации
+setTimeout(animateHeartAssembly, 800);
+</script>
+
+<style>
+#preloader-invitation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  opacity: 1;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+  overflow: hidden;
+  cursor: wait;
+}
+
+/* Сердечко-пазл */
+.heart-puzzle {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 40px;
+  transform: scale(0.8);
+  transition: transform 0.5s ease;
+}
+
+.heart-puzzle.complete {
+  transform: scale(1.2);
+  animation: heartBeat 1s infinite;
+}
+
+.heart-piece {
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.5) rotate(180deg);
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.heart-piece.assembled {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+/* Части пазла как отдельные кусочки сердца */
+.piece-1:before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  background: #ff4757;
+  border-radius: 20px 20px 0 0;
+  transform: rotate(-45deg);
+  transform-origin: 0 100%;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 8px;
+}
+
+.piece-2:before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  background: #ff4757;
+  border-radius: 20px 20px 0 0;
+  transform: rotate(45deg);
+  transform-origin: 100% 100%;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 20px;
+}
+
+.piece-3:before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 20px;
+  background: #ff4757;
+  border-radius: 0 0 8px 8px;
+  left: 0;
+}
+
+.piece-4:before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 20px;
+  background: #ff4757;
+  border-radius: 0 0 8px 8px;
+  right: 0;
+}
+
+.piece-5:before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 15px;
+  background: #ff4757;
+  border-radius: 0 0 0 12px;
+  transform: rotate(45deg);
+}
+
+.piece-6:before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 15px;
+  background: #ff4757;
+  border-radius: 0 0 12px 0;
+  transform: rotate(-45deg);
+}
+
+/* Позиционирование частей пазла для формирования сердца */
+.piece-1 { top: 8px; left: 15px; width: 20px; height: 25px; }
+.piece-2 { top: 8px; right: 15px; width: 20px; height: 25px; }
+.piece-3 { top: 25px; left: 20px; width: 15px; height: 20px; }
+.piece-4 { top: 25px; right: 20px; width: 15px; height: 20px; }
+.piece-5 { bottom: 8px; left: 28px; width: 12px; height: 15px; }
+.piece-6 { bottom: 8px; right: 28px; width: 12px; height: 15px; }
+
+/* Задержки появления */
+.piece-1.assembled { transition-delay: 0s; }
+.piece-2.assembled { transition-delay: 0.1s; }
+.piece-3.assembled { transition-delay: 0.2s; }
+.piece-4.assembled { transition-delay: 0.1s; }
+.piece-5.assembled { transition-delay: 0.3s; }
+.piece-6.assembled { transition-delay: 0.2s; }
+
+/* Текст загрузки */
+.loading-text {
+  text-align: center;
+  color: white;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.main-text {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.envelope {
+  display: inline-block;
+  font-size: 1.2em;
+  animation: envelopeBounce 2s infinite ease-in-out;
+}
+
+/* Анимированные точки */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: dotPulse 1.4s infinite ease-in-out;
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1.2) }
+  14% { transform: scale(1.3) }
+  28% { transform: scale(1.2) }
+  42% { transform: scale(1.25) }
+  70% { transform: scale(1.2) }
+  100% { transform: scale(1.2) }
+}
+
+@keyframes envelopeBounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Респонсив */
+@media (max-width: 480px) {
+  .slide-container {
+    width: 280px;
+    height: 50px;
+  }
+  
+  .slide-button {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .main-text {
+    font-size: 20px;
+  }
+  
+  .heart-puzzle {
+    width: 60px;
+    height: 60px;
+  }
+}
+</style>

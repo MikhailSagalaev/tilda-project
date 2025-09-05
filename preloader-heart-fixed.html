@@ -1,0 +1,227 @@
+<!-- Исправленный прелоадер: Загрузка приглашения с пазл-сердечком -->
+<div id="preloader-invitation">
+  <div class="heart-container">
+    <svg class="heart-svg" viewBox="0 0 100 90" width="80" height="72">
+      <!-- Пазл-части сердца как SVG paths -->
+      <defs>
+        <clipPath id="piece1-clip">
+          <path d="M20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 L50,45 Z"/>
+        </clipPath>
+        <clipPath id="piece2-clip">
+          <path d="M40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 L70,45 Z"/>
+        </clipPath>
+        <clipPath id="piece3-clip">
+          <path d="M30,45 L50,45 L50,65 L40,75 Z"/>
+        </clipPath>
+        <clipPath id="piece4-clip">
+          <path d="M50,45 L70,45 L60,75 L50,65 Z"/>
+        </clipPath>
+        <clipPath id="piece5-clip">
+          <path d="M40,75 L50,65 L50,85 Z"/>
+        </clipPath>
+        <clipPath id="piece6-clip">
+          <path d="M50,65 L60,75 L50,85 Z"/>
+        </clipPath>
+      </defs>
+      
+      <!-- Полное сердце как основа -->
+      <path class="heart-full" d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757" opacity="0.1"/>
+      
+      <!-- Пазл-части -->
+      <g class="heart-piece piece-1" clip-path="url(#piece1-clip)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="heart-piece piece-2" clip-path="url(#piece2-clip)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="heart-piece piece-3" clip-path="url(#piece3-clip)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="heart-piece piece-4" clip-path="url(#piece4-clip)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="heart-piece piece-5" clip-path="url(#piece5-clip)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="heart-piece piece-6" clip-path="url(#piece6-clip)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+    </svg>
+  </div>
+  
+  <div class="loading-text">
+    <div class="main-text">Загрузка приглашения <span class="envelope">💌</span></div>
+    <div class="dots">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+document.body.style.overflow = 'hidden';
+
+const pieces = document.querySelectorAll('.heart-piece');
+let currentPiece = 0;
+
+// Анимация сборки сердечка по частям
+function animateHeartAssembly() {
+  if (currentPiece < pieces.length) {
+    pieces[currentPiece].classList.add('assembled');
+    currentPiece++;
+    setTimeout(animateHeartAssembly, 600); // каждые 600ms новая часть
+  } else {
+    // Все части собраны - завершаем загрузку
+    setTimeout(() => {
+      document.querySelector('.heart-container').classList.add('complete');
+      setTimeout(completeLoading, 800);
+    }, 500);
+  }
+}
+
+function completeLoading() {
+  document.body.style.overflow = '';
+  const preloader = document.getElementById('preloader-invitation');
+  const fadeout = setInterval(() => {
+    const opacity = getComputedStyle(preloader).opacity;
+    opacity > 0 ? preloader.style.opacity = opacity - 0.05 : (clearInterval(fadeout), preloader.remove());
+  }, 15);
+}
+
+// Запуск анимации
+setTimeout(animateHeartAssembly, 1000);
+</script>
+
+<style>
+#preloader-invitation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  opacity: 1;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+  overflow: hidden;
+  cursor: wait;
+}
+
+/* Контейнер сердечка */
+.heart-container {
+  margin-bottom: 40px;
+  transform: scale(1);
+  transition: transform 0.5s ease;
+}
+
+.heart-container.complete {
+  animation: heartBeat 1.5s infinite ease-in-out;
+}
+
+/* SVG сердце */
+.heart-svg {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+/* Пазл-части */
+.heart-piece {
+  opacity: 0;
+  transform: scale(0.3) translate(var(--start-x, 0), var(--start-y, 0));
+  transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.heart-piece.assembled {
+  opacity: 1;
+  transform: scale(1) translate(0, 0);
+}
+
+/* Стартовые позиции для анимации сборки */
+.piece-1 { --start-x: -50px; --start-y: -30px; transition-delay: 0s; }
+.piece-2 { --start-x: 50px; --start-y: -30px; transition-delay: 0.1s; }
+.piece-3 { --start-x: -30px; --start-y: 20px; transition-delay: 0.2s; }
+.piece-4 { --start-x: 30px; --start-y: 20px; transition-delay: 0.3s; }
+.piece-5 { --start-x: -20px; --start-y: 40px; transition-delay: 0.4s; }
+.piece-6 { --start-x: 20px; --start-y: 40px; transition-delay: 0.5s; }
+
+/* Текст загрузки */
+.loading-text {
+  text-align: center;
+  color: white;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.main-text {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.envelope {
+  display: inline-block;
+  font-size: 1.2em;
+  animation: envelopeBounce 2s infinite ease-in-out;
+}
+
+/* Анимированные точки */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: dotPulse 1.4s infinite ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1) }
+  14% { transform: scale(1.1) }
+  28% { transform: scale(1) }
+  42% { transform: scale(1.05) }
+  70% { transform: scale(1) }
+  100% { transform: scale(1) }
+}
+
+@keyframes envelopeBounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Респонсив */
+@media (max-width: 480px) {
+  .main-text {
+    font-size: 20px;
+  }
+  
+  .heart-container {
+    transform: scale(0.8);
+  }
+}
+</style>

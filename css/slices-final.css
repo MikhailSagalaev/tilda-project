@@ -1,0 +1,102 @@
+/* Финальные стили для интерактивных слайсов */
+.slices-portal-section {
+  position: relative;
+  box-sizing: border-box;
+  height: 720px;
+  background: #eeede9;
+  margin: 80px 0;
+  overflow: hidden;
+}
+
+/* Границы только внутри артборда, не на всю ширину контейнера */
+.slices-portal-section .artboard {
+  position: relative;
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-top: 2px solid #000;
+  border-bottom: 2px solid #000;
+}
+
+.slices-portal-section .slices-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  z-index: 100;
+}
+
+.slices-portal-section .slice {
+  position: relative;
+  border-left: 2px solid #000;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.slices-portal-section .slice:last-child {
+  border-right: 2px solid #000;
+}
+
+.slices-portal-section .slice-label {
+  font-family: 'Montserrat', Arial, sans-serif;
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  z-index: 10;
+}
+
+.slices-portal-section .bg-portal {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.slices-portal-section.portal-ontop .bg-portal {
+  z-index: 200;
+  pointer-events: auto;
+}
+
+.slices-portal-section .bg-portal .bg-holder {
+  position: absolute;
+  inset: 0;
+  will-change: clip-path;
+  transition: clip-path 0.45s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slices-portal-section .bg-portal .bg-holder {
+    transition: none;
+  }
+}
+
+/* Убираем белые отступы в Zero-блоках */
+.slices-portal-section .bg-portal .bg-holder .t396__artboard {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.slices-portal-section .bg-portal .bg-holder .t396__carrier {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Элементы Zero-блока: убираем отступы слева/справа */
+.slices-portal-section .bg-portal .bg-holder .tn-elem[data-field-left-value*="-"] .tn-atom {
+  margin-left: 0 !important;
+}
+
+.slices-portal-section .bg-portal .bg-holder .tn-elem {
+  margin: 0 !important;
+}
+
+/* Для широких элементов в Zero-блоке - растягиваем на всю ширину */
+.slices-portal-section .bg-portal .bg-holder .tn-elem[data-field-width-value="1530"],
+.slices-portal-section .bg-portal .bg-holder .tn-elem[data-field-width-value="1529"] {
+  width: 100% !important;
+  left: 0 !important;
+}

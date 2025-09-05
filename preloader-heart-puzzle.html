@@ -1,0 +1,173 @@
+<!-- Прелоадер: Пазл-сердце (4 изображения) + прогрессбар -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Preloader Heart Puzzle</title>
+  <style>
+  :root { --accent: #e31b23; --accent-glow: rgba(227, 27, 35, 0.45); }
+
+  /* Оверлей */
+  #preloader-heart {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999999999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: #ffffff;
+    opacity: 1;
+    overflow: hidden;
+    cursor: progress;
+    transition: opacity .5s ease;
+  }
+
+  .wrap { display: flex; flex-direction: column; align-items: center; }
+
+  /* Контейнер сердца */
+  .heart {
+    position: relative;
+    width: min(70vw, 420px);
+    /* Соотношение сторон мастера (Figma: 984×869) */
+    aspect-ratio: 984 / 869;
+    filter: drop-shadow(0 12px 30px rgba(0,0,0,.25));
+  }
+  /* Слабое свечение вокруг сердца */
+  .heart::before {
+    content: "";
+    position: absolute; inset: -6%;
+    background: radial-gradient(closest-side, rgba(227,27,35,.35), rgba(227,27,35,0));
+    filter: blur(12px);
+    z-index: 0;
+  }
+
+  /* Вариант А: каждый кусок — полноразмерная подложка поверх контейнера */
+  .slot { position: absolute; inset: 0; z-index: 1; opacity: 0; will-change: transform, opacity; }
+  .slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+
+  /* Исходные смещения (вылетают к центру) */
+  .slot.tl { transform: translate3d(-35%, -35%, 0) rotate(-8deg) scale(.98); transition: transform 1100ms cubic-bezier(.22,.61,.36,1), opacity 700ms ease; }
+  .slot.bl { transform: translate3d(-35%,  35%, 0) rotate( 7deg)  scale(.98); transition: transform 1100ms cubic-bezier(.22,.61,.36,1), opacity 700ms ease; }
+  .slot.br { transform: translate3d( 35%,  35%, 0) rotate(-6deg)  scale(.98); transition: transform 1100ms cubic-bezier(.22,.61,.36,1), opacity 700ms ease; }
+  .slot.tr { transform: translate3d( 35%, -35%, 0) rotate( 9deg)  scale(.98); transition: transform 1100ms cubic-bezier(.22,.61,.36,1), opacity 700ms ease; }
+
+  .slot.in { opacity: 1; transform: translate3d(0,0,0) rotate(0) scale(1); }
+
+  /* Прогрессбар под сердцем */
+  .progress {
+    width: min(66vw, 360px);
+    height: 8px;
+    margin-top: 28px;
+    background: rgba(227, 27, 35, 0.15);
+    border-radius: 999px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.04);
+  }
+  .bar {
+    width: 0%; height: 100%;
+    background: var(--accent);
+    box-shadow:
+      inset 0 0 12px rgba(255,255,255,.35),
+      0 0 18px var(--accent-glow),
+      0 2px 8px rgba(227,27,35,.25);
+    transition: width 400ms ease;
+  }
+
+  /* Подпись над прогрессбаром */
+  .label { margin-bottom: 10px; font-family: 'Montserrat', Arial, sans-serif; font-size: 14px; color: #222; letter-spacing: .02em; display: flex; align-items: center; }
+  .label .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-left: 6px; opacity: .25; animation: dotPulse 1.2s infinite ease-in-out; }
+  .label .dot.d2 { animation-delay: .2s; }
+  .label .dot.d3 { animation-delay: .4s; }
+
+  @keyframes dotPulse {
+    0%, 20% { transform: translateY(0); opacity: .25; }
+    50%     { transform: translateY(-2px); opacity: 1; }
+    100%    { transform: translateY(0); opacity: .25; }
+  }
+
+  /* Снижаем движение, если пользователь против анимаций */
+  @media (prefers-reduced-motion: reduce) {
+    .slot { transition: none; opacity: 1; transform: none; }
+    .bar { transition: none; }
+    .label .dot { animation: none; opacity: 1; }
+    #preloader-heart { transition: none; }
+  }
+  </style>
+</head>
+<body>
+  <div id="preloader-heart" aria-hidden="true">
+    <div class="wrap">
+      <div class="heart" id="heart">
+        <!-- Вариант А: четыре PNG на одном и том же холсте. Поменяй источники при необходимости -->
+        <div class="slot tl"><img alt="Пазл — верхняя левая часть" src="https://static.tildacdn.com/tild3533-6634-4162-b439-613536326565/Frame_2087326693.png" /></div>
+        <div class="slot tr"><img alt="Пазл — верхняя правая часть" src="https://static.tildacdn.com/tild3661-3338-4635-b233-636439336661/Frame_2087326693_1.png" /></div>
+        <div class="slot bl"><img alt="Пазл — нижняя левая часть" src="https://static.tildacdn.com/tild3864-6166-4533-b336-633265353964/Frame_2087326693_2.png" /></div>
+        <div class="slot br"><img alt="Пазл — нижняя правая часть" src="https://static.tildacdn.com/tild6561-3962-4133-a561-333264616438/Frame_2087326693_3.png" /></div>
+      </div>
+      <div class="label">Загрузка приглашения… <span class="dot"></span><span class="dot d2"></span><span class="dot d3"></span></div>
+      <div class="progress" aria-label="Загрузка" aria-live="polite"><div class="bar" id="bar"></div></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    // Блокируем скролл страницы на время прелоадера
+    var prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    var root = document.getElementById('preloader-heart');
+    var heart = document.getElementById('heart');
+    var bar = document.getElementById('bar');
+    var pieces = Array.prototype.slice.call(heart.querySelectorAll('.slot img'));
+
+    // Ждём загрузки всех изображений
+    function waitImage(img){
+      return new Promise(function(resolve){
+        if (img.complete) return resolve();
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+      });
+    }
+
+    Promise.all(pieces.map(waitImage)).then(startAnimation);
+
+    function setProgress(p) { bar.style.width = Math.max(0, Math.min(100, p)) + '%'; }
+
+    function startAnimation(){
+      // Порядок сборки: tl -> tr -> bl -> br
+      var order = ['tl','tr','bl','br'];
+      var steps = [25, 50, 75, 100];
+      var pieceDuration = 1200;  // медленнее прилёт одного куска
+      var pieceStagger  = 520;   // больше задержка между кусочками
+
+      // Запускаем поочерёдную вставку
+      order.forEach(function(key, i){
+        var slot = heart.querySelector('.slot.'+key);
+        setTimeout(function(){ if (slot) slot.classList.add('in'); }, i * pieceStagger);
+        setTimeout(function(){ setProgress(steps[i]); }, i * pieceStagger + Math.min(300, pieceDuration - 300));
+      });
+
+      // После финала — небольшая пауза и скрываем прелоадер
+      var total = (order.length - 1) * pieceStagger + pieceDuration + 700;
+      setTimeout(finish, total);
+    }
+
+    function finish(){
+      root.style.opacity = '0';
+      setTimeout(function(){
+        root.remove();
+        document.body.style.overflow = prevOverflow || '';
+      }, 500);
+    }
+  })();
+  </script>
+</body>
+</html>
+
+

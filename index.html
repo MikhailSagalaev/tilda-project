@@ -460,6 +460,61 @@
                 display: none;
             }
         }
+
+        /* ===== Interactive vertical slices: Variant 1 (with external rec backgrounds) ===== */
+        .slices-portal-section {
+            position: relative;
+            height: 720px;
+            background: #eeede9;
+            margin: 80px 0;
+            border: 1px solid #e5e5e5;
+        }
+        .slices-portal-section .artboard {
+            position: relative;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .slices-portal-section .slices-grid {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            z-index: 100;
+        }
+        .slices-portal-section .slice {
+            position: relative;
+            border-left: 1px solid #000;
+        }
+        .slices-portal-section .slice:first-child { border-left: none; }
+        .slices-portal-section .slice-label {
+            position: absolute;
+            left: 20px;
+            bottom: 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+        .slices-portal-section .bg-portal {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .slices-portal-section .bg-portal .bg-holder {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity .25s ease, clip-path .45s ease;
+            clip-path: inset(0 100% 0 0);
+        }
+        .slices-portal-section .bg-portal .bg-holder.is-visible { opacity: 1; }
+        .slices-portal-section .bg-portal .bg-holder.is-open { clip-path: inset(0 0 0 0); pointer-events: auto; }
+        .hide-rec { position: fixed; left: -99999px; top: -99999px; width: 0; height: 0; overflow: hidden; }
+        .rec-artboard { width: 100%; height: 100%; background-size: cover; background-position: center; position: absolute; inset: 0; }
+
+        /* Variant 2 создаётся целиком скриптом → общие стили уже есть */
     </style>
 </head>
 <body>
@@ -516,6 +571,90 @@
             </div>
         </div>
     </section>
+
+    <!-- Interactive Slices - Variant 1 (with external rec backgrounds) -->
+    <section class="slices-portal-section" id="interactive-variant-1">
+        <div class="artboard" id="artboard-v1">
+            <div class="bg-portal" id="bg-portal-v1"></div>
+            <div class="slices-grid" id="slices-grid-v1">
+                <div class="slice" data-slice-id="s1"><div class="slice-label">концепт</div></div>
+                <div class="slice" data-slice-id="s2"><div class="slice-label">планировка</div></div>
+                <div class="slice" data-slice-id="s3"><div class="slice-label">визуализация</div></div>
+                <div class="slice" data-slice-id="s4"><div class="slice-label">чертежи</div></div>
+                <div class="slice" data-slice-id="s5"><div class="slice-label">сопровождение</div></div>
+                <div class="slice" data-slice-id="s6"><div class="slice-label">комплектация</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hidden rec backgrounds (sources) for Variant 1 -->
+    <section id="rec-bg-1" class="hide-rec">
+        <div class="rec-artboard" style="background-image:url('https://optim.tildacdn.com/tild3433-6663-4536-b536-333432643436/-/format/webp/09.jpg.webp');">
+            <div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);color:#fff;text-align:center;">
+                <h2 style="font-size:36px;line-height:1.2;">ELEVATING COMFORT<br>WITH EVERY CURVE</h2>
+                <a href="#" style="display:inline-block;margin-top:12px;padding:10px 18px;background:#fff;color:#333;border-radius:20px;text-decoration:none;">EXPLORE EXPERIENCE</a>
+            </div>
+        </div>
+    </section>
+    <section id="rec-bg-2" class="hide-rec">
+        <div class="rec-artboard" style="background-image:url('https://optim.tildacdn.com/tild3330-3964-4166-a366-353738366139/-/format/webp/03.jpg.webp');">
+            <div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);color:#fff;text-align:center;">
+                <h2 style="font-size:36px;line-height:1.2;">OUR TECHNOLOGY</h2>
+            </div>
+        </div>
+    </section>
+    <section id="rec-bg-3" class="hide-rec">
+        <div class="rec-artboard" style="background-image:url('https://optim.tildacdn.com/tild3530-3839-4433-b133-313963303964/-/format/webp/31.jpg.webp');">
+            <div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);color:#fff;text-align:center;">
+                <h2 style="font-size:36px;line-height:1.2;">OUR STORY</h2>
+            </div>
+        </div>
+    </section>
+    <section id="rec-bg-4" class="hide-rec">
+        <div class="rec-artboard" style="background-image:url('https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1920&auto=format&fit=crop');">
+            <div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);color:#fff;text-align:center;">
+                <h2 style="font-size:36px;line-height:1.2;">OUR DESIGN TEAM</h2>
+            </div>
+        </div>
+    </section>
+    <section id="rec-bg-5" class="hide-rec">
+        <div class="rec-artboard" style="background-image:url('https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1920&auto=format&fit=crop');">
+            <div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);color:#fff;text-align:center;">
+                <h2 style="font-size:36px;line-height:1.2;">SUPPORT</h2>
+            </div>
+        </div>
+    </section>
+    <section id="rec-bg-6" class="hide-rec">
+        <div class="rec-artboard" style="background-image:url('https://images.unsplash.com/photo-1600585154340-1eacdc3db9d8?q=80&w=1920&auto=format&fit=crop');">
+            <div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);color:#fff;text-align:center;">
+                <h2 style="font-size:36px;line-height:1.2;">COMPLETION</h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- Variant 2: источники-задники (любое число). Скрипт сам создаст сетку. -->
+    <section id="variant2-sources" class="hide-rec">
+        <section id="rec2-1" class="slice-source" data-label="концепт">
+            <div class="rec-artboard" style="background-image:url('https://optim.tildacdn.com/tild3433-6663-4536-b536-333432643436/-/format/webp/09.jpg.webp');"></div>
+        </section>
+        <section id="rec2-2" class="slice-source" data-label="планировка">
+            <div class="rec-artboard" style="background-image:url('https://optim.tildacdn.com/tild3330-3964-4166-a366-353738366139/-/format/webp/03.jpg.webp');"></div>
+        </section>
+        <section id="rec2-3" class="slice-source" data-label="визуализация">
+            <div class="rec-artboard" style="background-image:url('https://optim.tildacdn.com/tild3530-3839-4433-b133-313963303964/-/format/webp/31.jpg.webp');"></div>
+        </section>
+        <section id="rec2-4" class="slice-source" data-label="чертежи">
+            <div class="rec-artboard" style="background-image:url('https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1920&auto=format&fit=crop');"></div>
+        </section>
+        <section id="rec2-5" class="slice-source" data-label="сопровождение">
+            <div class="rec-artboard" style="background-image:url('https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1920&auto=format&fit=crop');"></div>
+        </section>
+        <section id="rec2-6" class="slice-source" data-label="комплектация">
+            <div class="rec-artboard" style="background-image:url('https://images.unsplash.com/photo-1600585154340-1eacdc3db9d8?q=80&w=1920&auto=format&fit=crop');"></div>
+        </section>
+    </section>
+    <!-- Контейнер, куда скрипт №2 положит полностью созданный блок -->
+    <section id="interactive-variant-2" style="margin:80px 0;"></section>
 
     <!-- Features Section -->
     <section class="features">
@@ -782,5 +921,7 @@
 
     <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
-</body>
+    <script src="js/slices-zero-grid.js"></script>
+    <script src="js/slices-autogrid.js"></script>
+  </body>
 </html>

@@ -1,0 +1,171 @@
+<!-- Прелоадер: Пазл‑сердце (совместимый с Тильдой, без внешних библиотек) -->
+<div id="preloader-heart">
+  <div class="puzzle-container">
+    <svg class="heart-svg" viewBox="0 0 100 90" width="96" height="86" aria-label="Собирающееся сердечко">
+      <defs>
+        <clipPath id="p1"><path d="M20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 L50,45 Z"/></clipPath>
+        <clipPath id="p2"><path d="M40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 L70,45 Z"/></clipPath>
+        <clipPath id="p3"><path d="M30,45 L50,45 L50,65 L40,75 Z"/></clipPath>
+        <clipPath id="p4"><path d="M50,45 L70,45 L60,75 L50,65 Z"/></clipPath>
+        <clipPath id="p5"><path d="M40,75 L50,65 L50,85 Z"/></clipPath>
+        <clipPath id="p6"><path d="M50,65 L60,75 L50,85 Z"/></clipPath>
+      </defs>
+
+      <!-- приглушённая подложка сердца -->
+      <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757" opacity="0.08"/>
+
+      <!-- шесть частей-пазла -->
+      <g class="piece" data-i="1" clip-path="url(#p1)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="piece" data-i="2" clip-path="url(#p2)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="piece" data-i="3" clip-path="url(#p3)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="piece" data-i="4" clip-path="url(#p4)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="piece" data-i="5" clip-path="url(#p5)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+      <g class="piece" data-i="6" clip-path="url(#p6)">
+        <path d="M50,85 C50,85 20,65 20,30 C20,20 30,15 40,25 C50,15 60,20 60,30 C60,20 70,15 80,25 C90,15 100,20 100,30 C100,65 70,85 50,85 Z" fill="#ff4757"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="loading-text">
+    <div class="main-text">Загрузка приглашения <span class="emoji" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:-0.2em">
+        <path fill="#fff" opacity=".9" d="M3 6h18a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a1 1 0 0 1 1-1zm1.5 2 7.5 5 7.5-5H4.5z"/>
+        <path fill="#ff4757" d="M12 13.2c1.9-1.8 4.6-3.2 4.6-5.3A2.6 2.6 0 0 0 14 5.2c-.9 0-1.6.5-2 1.2-.4-.7-1.1-1.2-2-1.2A2.6 2.6 0 0 0 7.4 7.9c0 2.1 2.7 3.5 4.6 5.3z"/>
+      </svg>
+    </span></div>
+    <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+  </div>
+</div>
+
+<script>
+// Блокируем скролл во время прелоадера
+document.body.style.overflow = 'hidden';
+
+(function() {
+  var overlay = document.getElementById('preloader-heart');
+  var pieces = overlay.querySelectorAll('.piece');
+  var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Готовим стартовое разбрасывание (как в slide-версии — только нативные API)
+  function scatter() {
+    for (var i = 0; i < pieces.length; i++) {
+      var angle = (i / pieces.length) * Math.PI * 2;
+      var radius = 120 + Math.random() * 60; // SVG единицы ~px
+      var sx = Math.cos(angle) * radius;
+      var sy = Math.sin(angle) * radius;
+      var rot = (Math.random() * 440) - 220;
+      var el = pieces[i];
+      el.style.transition = 'none';
+      el.style.opacity = '0';
+      el.style.transformOrigin = '50% 50%';
+      el.style.transformBox = 'fill-box';
+      el.style.transform = 'translate(' + sx + 'px,' + sy + 'px) rotate(' + rot + 'deg) scale(0.6)';
+    }
+    // принудительный reflow
+    overlay.getBoundingClientRect();
+  }
+
+  function assemble() {
+    for (var i = 0; i < pieces.length; i++) {
+      (function(index){
+        var el = pieces[index];
+        setTimeout(function(){
+          el.style.transition = 'transform 800ms cubic-bezier(0.68,-0.55,0.265,1.55), opacity 800ms ease';
+          el.style.opacity = '1';
+          el.style.transform = 'translate(0,0) rotate(0) scale(1)';
+        }, 150 * index);
+      })(i);
+    }
+
+    // лёгкое биение после сборки и исчезновение
+    setTimeout(function(){
+      var box = overlay.querySelector('.puzzle-container');
+      box.style.transition = 'transform 220ms ease-in-out';
+      box.style.transform = 'scale(1.06)';
+      setTimeout(function(){
+        box.style.transform = 'scale(1)';
+        fadeOut();
+      }, 240);
+    }, 150 * pieces.length + 900);
+  }
+
+  function fadeOut() {
+    var opacity = 1;
+    var timer = setInterval(function(){
+      opacity -= 0.05;
+      if (opacity <= 0) {
+        clearInterval(timer);
+        if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        document.body.style.overflow = '';
+      } else {
+        overlay.style.opacity = String(opacity);
+      }
+    }, 16);
+  }
+
+  if (prefersReduced) {
+    // Без анимации — сразу показать и убрать
+    scatter();
+    for (var i = 0; i < pieces.length; i++) {
+      pieces[i].style.opacity = '1';
+      pieces[i].style.transform = 'none';
+    }
+    setTimeout(fadeOut, 700);
+  } else {
+    setTimeout(function(){
+      scatter();
+      setTimeout(assemble, 120); // даём кадр на применениe стартового состояния
+    }, 100);
+  }
+})();
+</script>
+
+<style>
+#preloader-heart {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  opacity: 1;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+  overflow: hidden;
+  cursor: wait;
+}
+
+.puzzle-container { margin-bottom: 36px; }
+.heart-svg { display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,.18)); }
+.piece { opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+
+.loading-text { text-align: center; color: #fff; font-family: 'Montserrat', Arial, sans-serif; }
+.main-text { font-size: 24px; font-weight: 600; letter-spacing: .5px; text-shadow: 0 2px 4px rgba(0,0,0,.28); }
+
+.dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+.dot { width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,.2); animation: dotPulse 1.4s infinite ease-in-out; }
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+
+@keyframes dotPulse { 0%,80%,100% { transform: scale(.8); opacity: .55; } 40% { transform: scale(1.2); opacity: 1; } }
+
+@media (max-width: 480px) { .main-text{font-size:20px;} .puzzle-container{transform:scale(.9);} }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+
